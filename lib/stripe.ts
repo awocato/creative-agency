@@ -7,11 +7,9 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 export const getStripeSession = async ({
   priceId,
-  domainUrl,
   customerId,
 }: {
   priceId: string;
-  domainUrl: string;
   customerId: string;
 }) => {
   const session = await stripe.checkout.sessions.create({
@@ -24,8 +22,8 @@ export const getStripeSession = async ({
       address: "auto",
       name: "auto",
     },
-    success_url: `${domainUrl}/payment/success`,
-    cancel_url: `${domainUrl}/payment/cancelled`,
+    success_url: "https://saas-seven-amber.vercel.app/payment/success",
+    cancel_url: "https://saas-seven-amber.vercel.app/payment/cancelled",
   });
 
   return session.url as string;
