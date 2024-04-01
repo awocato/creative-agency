@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import prisma from "@/lib/db";
-import { currentUser } from "@clerk/nextjs";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidatePath, unstable_noStore as noStore } from "next/cache";
 
@@ -39,7 +39,8 @@ export default async function DynamicRoute({
 }: {
   params: { id: string };
 }) {
-  const user = await currentUser();
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   const data = await getData({ userId: user?.id as string, noteId: params.id });
 
   async function postData(formData: FormData) {

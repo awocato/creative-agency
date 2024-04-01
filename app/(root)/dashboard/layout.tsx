@@ -1,8 +1,11 @@
+import type { ReactNode } from "react";
 import DashboardNavbar from "@/components/DashboardNavbar";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
-import { unstable_noStore as noStore } from "next/cache";
-import { currentUser } from "@clerk/nextjs";
 import { stripe } from "@/lib/stripe";
+import { unstable_noStore as noStore } from "next/cache";
+
 async function getData({
   email,
   id,
@@ -34,7 +37,7 @@ async function getData({
         id: id,
         email: email,
         name: name,
-        profileImage: profileImage,
+        
       },
     });
   }
@@ -55,22 +58,26 @@ async function getData({
   }
 }
 
-export default async function Layout({
+export default async function DashboardLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const user = await currentUser();
+}: {
+  children: ReactNode;
+}) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+  if (!user) {
+    return redirect("/");
+  }
   await getData({
-    email: user?.externalAccounts[0].emailAddress as string,
-    firstName: user?.firstName as string,
-    id: user?.id as string,
-    lastName: user?.lastName as string,
-    profileImage: user?.imageUrl as string,
+    email: user.email as string,
+    firstName: user.given_name as string,
+    id: user.id as string,
+    lastName: user.family_name as string,
+    profileImage: user.picture as string,
   });
 
   return (
-    <div className="flex flex-col space-y-6 mt-6 pb-10">
+    <div className="flex flex-col space-y-4 ">
       <div className="container grid flex-1 gap-12 md:grid-cols-[200px_1fr]">
         <aside className="hidden w-[200px] flex-col md:flex">
           <DashboardNavbar />

@@ -13,13 +13,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import prisma from "@/lib/db";
-import { currentUser } from "@clerk/nextjs";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
 
 export default async function NewNoteRoute() {
   noStore();
-  const user = await currentUser();
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
 
   async function postData(formData: FormData) {
     "use server";

@@ -14,7 +14,7 @@ datasource db {
 model User {
   id               String        @id @unique
   name             String?
-  email            String        @unique
+  email            String?       @unique
   stripeCustomerId String?       @unique
   colorScheme      String?       @default("theme-tokyo")
   profileImage     String?           

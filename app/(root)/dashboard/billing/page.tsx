@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -8,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 import prisma from "@/lib/db";
-import { currentUser } from "@clerk/nextjs";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { getStripeSession, stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import {
@@ -43,9 +42,9 @@ async function getData(userId: string) {
 
   return data;
 }
-
 export default async function BillingPage() {
-  const user = await currentUser();
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   const data = await getData(user?.id as string);
 
   async function createSubscription() {
@@ -67,7 +66,7 @@ export default async function BillingPage() {
     const subscriptionUrl = await getStripeSession({
       customerId: dbUser.stripeCustomerId,
       domainUrl:
-        process.env.NODE_ENV === "production"
+        process.env.NODE_ENV == "production"
           ? (process.env.PRODUCTION_URL as string)
           : "http://localhost:3000",
       priceId: process.env.STRIPE_PRICE_ID as string,
@@ -98,6 +97,7 @@ export default async function BillingPage() {
             <p className="text-lg text-muted-foreground">
               Settings reagding your subscription
             </p>
+            <p className="text-muted-foreground font-medium">Note: card for testing 4242 4242 4242 4242</p>
           </div>
         </div>
 
@@ -121,7 +121,7 @@ export default async function BillingPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-4">
+    <div className="max-w-md mx-auto space-y-4 pb-10">
       <Card className="flex flex-col">
         <CardContent className="py-8">
           <div>
@@ -137,9 +137,9 @@ export default async function BillingPage() {
             Write as many notes as you want for $30 a Month
           </p>
         </CardContent>
-        <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-secondary- rounded-lg m-1 space-y-6 sm:p-10 sm:pt-6">
+        <div className="flex-1 flex flex-col justify-between px-6 pt-6 pb-8 bg-primary-foreground/25 rounded-lg m-1 space-y-6 sm:p-10  sm:pt-6">
           <ul className="space-y-4">
-            {featureItems.map((item) => (
+            {featureItems.map((item, index) => (
               <li key={item.name} className="flex items-center">
                 <div className="flex-shrink-0">
                   <CheckCircle2 className="h-6 w-6 text-green-500" />

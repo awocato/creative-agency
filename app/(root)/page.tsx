@@ -1,12 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { currentUser } from "@clerk/nextjs";
+import { RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server";
+
 import { redirect } from "next/navigation";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 export default async function Page() {
-  const user = await currentUser();
-  if (user) {
+  const { isAuthenticated } = getKindeServerSession();
+
+  if (await isAuthenticated()) {
     return redirect("/dashboard");
   }
 
@@ -28,9 +30,9 @@ export default async function Page() {
           </div>
           <div className="flex justify-center max-w-sm mx-auto mt-10">
             <Button size="lg" className="w-full rounded-md">
-              <Link className="text-lg font-bold" href="/sign-up">
+              <RegisterLink className="text-lg font-bold" >
                 sign up for free
-              </Link>
+              </RegisterLink>
             </Button>
           </div>
         </div>

@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import prisma from "@/lib/db";
-import { currentUser } from "@clerk/nextjs";
-import { Edit, File, Trash } from "lucide-react";
+import { Edit, File} from "lucide-react";
 import { Card } from "@/components/ui/card";
-
 import { TrashDelete } from "@/components/SubmitButton";
 import { revalidatePath, unstable_noStore as noStore } from "next/cache";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 async function getData(userId: string) {
   noStore();
@@ -39,7 +38,8 @@ async function getData(userId: string) {
 }
 
 export default async function DashboardPage() {
-  const user = await currentUser();
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
   const data = await getData(user?.id as string);
 
   async function deleteNote(formData: FormData) {
@@ -57,10 +57,10 @@ export default async function DashboardPage() {
   }
   return (
     <div className="grid items-start gap-y-8">
-      <div className="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between px-2">
+      <div className="flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between ">
         <div className="grid gap-1">
           <h1 className="text-3xl md:text-4xl">Your Notes</h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-md font-medium md:text-lg text-muted-foreground">
             Here you can see and create new notes
           </p>
         </div>
@@ -111,10 +111,13 @@ export default async function DashboardPage() {
                 <h2 className="font-semibold text-xl text-primary">
                   {item.title}
                 </h2>
-                <p>
+                <p className="text-sm text-primary/25 font-medium">
                   {new Intl.DateTimeFormat("en-US", {
                     dateStyle: "full",
                   }).format(new Date(item.createdAt))}
+                </p>
+                <p>
+                  {item.description}
                 </p>
               </div>
 
